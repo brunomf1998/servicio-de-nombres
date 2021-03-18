@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicio de nombres</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="display-5 text-center my-3">Servicio de nombres</h1>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-lg-6">
+                <label class="form-label">Alias de la página a consultar</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text">www.example.com</span>
+                    <input type="text" class="form-control" id="input">
+                    <button id="btn" class="btn btn-primary">Consultar</button>
+                </div>
+
+                <div class="row justify-content-center my-3" id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <template id="template-card">
+        <div class="card" style="width: 30rem;">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col fw-bold">Dirección(es)</div>
+                        <div class="col" id="ips"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </template>
+
+    <template id="template-ips">
+        <p class="mb-0">ip</p>
+    </template>
+
+    <script>
+        const template = document.getElementById('template-card').content;
+        const templateIps = document.getElementById('template-ips').content;
+        const input = document.getElementById('input');
+        const btn = document.getElementById('btn');
+        const fragment = document.createDocumentFragment();
+        const result = document.getElementById('result');
+        const ips = template.querySelector('#ips');
+
+        btn.addEventListener('click', async () => {
+            const value = input.value;
+            try {
+                const data = await fetch(`/${value}`, { method: 'POST' });
+                const res = await data.json();
+                console.log(res);
+
+                ips.innerHTML = '';
+                if (res.addresses) {
+                    res.addresses.forEach(item => {
+                        const clone = templateIps.cloneNode(true);
+                        clone.querySelector('p').textContent = item.address;
+                        fragment.appendChild(clone);
+                    });
+                    ips.appendChild(fragment);
+                    const cloneT = template.cloneNode(true);
+                    result.innerHTML = '';
+                    result.appendChild(cloneT);                    
+                } else {
+                    result.innerHTML = `<div class="alert alert-danger" role="alert">Ocurrió un error al obtener la(s) dirección(es). Verificar el alias ingresado.</div>`;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
+</body>
+</html>
