@@ -61,7 +61,7 @@
                 if (res.addresses) {
                     res.addresses.forEach(item => {
                         const clone = templateIps.cloneNode(true);
-                        clone.querySelector('p').textContent = item.address;
+                        clone.querySelector('p').innerHTML = item.address + ` <span class="fw-bold">(IPv${item.family})</span>`;
                         fragment.appendChild(clone);
                     });
                     ips.appendChild(fragment);
